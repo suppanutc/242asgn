@@ -75,7 +75,7 @@ void htable_print(htable h, FILE *stream){
     for(i = 0; i < h->capacity; i++){
         j = 0;
         if(NULL != h->keys[i]){
-            fprintf(stream, "%d ", h->frequencies[i]);
+            fprintf(stream, "%-4d ", h->frequencies[i]);
             while(h->keys[i][j] != '\0'){
                 fprintf(stream, "%c", h->keys[i][j]);
                 j++;
