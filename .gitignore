@@ -3,3 +3,5 @@
 war-and-peace-20.txt
 .*
 !/.gitignore
+*.h~
+.gitignore~
