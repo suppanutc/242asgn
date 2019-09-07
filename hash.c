@@ -25,7 +25,7 @@ int main(int argc, char **argv){
         htable_insert(h, word);
     }
     
-    htable_print(h, stdout);
+    htable_print_stats(h, stdout, 1);
     htable_free(h);
     return EXIT_SUCCESS;
 }

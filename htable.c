@@ -4,9 +4,6 @@
 #include "htable.h"
 #include "mylib.h"
 
-
-
-
 struct htablerec {
     int num_keys;
     int capacity;
@@ -36,6 +33,7 @@ htable htable_new(int capacity, hashing_t method){
     result->frequencies = emalloc(capacity * sizeof result->frequencies[0]);
     result->keys = emalloc(capacity * sizeof result->keys[0]);
     result->method = method;
+    result->stats = malloc(capacity * sizeof result->stats[0]); 
     return result;
 }
 
@@ -56,7 +54,6 @@ int htable_insert(htable h, char *str){
     int insert_pos = wordint % h->capacity;
     int i = 0;
     unsigned int step = htable_step(h, wordint);
-
     while(NULL != h->keys[insert_pos] && strcmp(h->keys[insert_pos], str) != 0 && i < h->capacity){
         if ( h->method == LINEAR_P ){
             insert_pos = (insert_pos+1) % h->capacity;
@@ -65,6 +62,9 @@ int htable_insert(htable h, char *str){
         }
         i++;
     }
+
+    h->stats[h->num_keys] = i;
+
     if(NULL == h->keys[insert_pos]){
         h->keys[insert_pos] = emalloc(sizeof str);
         strcpy(h->keys[insert_pos], str);
