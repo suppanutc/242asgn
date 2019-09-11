@@ -24,7 +24,9 @@ int main(int argc, char **argv){
     while (getword(word, sizeof word, stdin) != EOF){
         htable_insert(h, word);
     }
-    
+   
+	   
+    htable_print_entire_table(h, stderr);    
     htable_print_stats(h, stdout, 1);
     htable_free(h);
     return EXIT_SUCCESS;

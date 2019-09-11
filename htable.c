@@ -95,6 +95,18 @@ void htable_print(htable h, FILE *stream){
     }
 }
 
+void htable_print_entire_table(htable h, FILE *stream){
+	int i = 0;
+	for (i = 0; i < h->capacity; i++){
+	     if(NULL != h->keys[i]){
+ 		fprintf(stream, "%5d %5d %5d   %s\n", i, h->frequencies[i], h->stats[i], h->keys[i]);
+	     }else {
+	        fprintf(stream, "%5d %5d %5d    \n", i, h->frequencies[i], h->stats[i]);
+	     }
+	}
+}
+
+
 int htable_search(htable h, char *key){
     int collisions = 0;
     unsigned int keyint = htable_word_to_int(key);
