@@ -4,6 +4,11 @@
 #include <ctype.h>
 #include "mylib.h"
 
+/** 
+ * Allocates memory and checks if the memory was allocated.
+ *
+ * @param s - the size of memory to allocate.
+ */
 void *emalloc(size_t s) {
     void *result = malloc(s);
     if (NULL == result) {
@@ -13,6 +18,12 @@ void *emalloc(size_t s) {
     return result;
 }
 
+/** 
+ * Reallocates memory and checks if the memory was reallocated. 
+ *
+ * @param p - a pointer to the memory to realloc.
+ * @param s - the size of memory to realloc.
+ */
 void *erealloc(void *p, size_t s) {
     void *result = realloc(p, s);
     if (NULL == result) {
@@ -22,6 +33,15 @@ void *erealloc(void *p, size_t s) {
     return result;
 }
 
+/** 
+ * Gets a word from the given stream.
+ *
+ * @param s - a pointer to the memory to store the word in.
+ * @param limit - the size of the memory given by s.
+ * @stream - a stream to read from.
+ *
+ * @returns - EOF if the end of file is reached.
+ */
 int getword(char *s, int limit, FILE *stream) {
     int c;
     char *w = s;
@@ -48,6 +68,12 @@ int getword(char *s, int limit, FILE *stream) {
     return w - s;
 }
 
+/** Returns the smallest prime number greater than x.
+ *
+ * @param x - the number to be greater than.
+ * 
+ * @returns - the prime number.
+ */
 int next_prime(int x) {
     int i, is_prime = 0;
     while(is_prime == 0){

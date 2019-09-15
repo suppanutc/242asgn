@@ -4,6 +4,19 @@
 #include "htable.h"
 #include "mylib.h"
 
+/**
+ * A struct to hold all of the hash table data.
+ * Num_keys - the total number of keys held by the table at any 
+ * time.
+ * Capacity - the size of the table.
+ * keys - an array of strings holding the keys.
+ * Frequencies - an integer array containing the frequancy of each 
+ * key.
+ * Stats - information about the number of collisions each key insertion
+ * generated.
+ * Method - the hashing method to use, double hashing or linear 
+ * probing.
+ */
 struct htablerec {
     int num_keys;
     int capacity;
@@ -13,6 +26,14 @@ struct htablerec {
     hashing_t method;
 };
 
+/**
+ * Calculates an integer based on a string used to determine a keys 
+ * insert position. 
+ *
+ * @param word - the string to calculate based off of. 
+ *
+ * @returns - the integer calculated, unsigned.
+ */
 static unsigned int htable_word_to_int(char *word){
     unsigned int result = 0;
 
@@ -22,10 +43,28 @@ static unsigned int htable_word_to_int(char *word){
     return result;
 }
 
+/**
+ * Calculates the step size for double hashing. 
+ *
+ * @param h - the table.
+ * @param i_key - the integer calculated by htable_word_to_int.
+ *
+ * @returns - the step to take as an unsigned integer.
+ */
 static unsigned int htable_step(htable h, unsigned int i_key) {
     return 1 + (i_key % (h->capacity - 1));
 }
 
+/**
+ * Creates a new hash table, setting its capacity and hashing method
+ * and allocating memory.
+ * 
+ * @param capacity - the size of the hash table to be created.
+ * @param method - the hashing method to use (double hashing or 
+ * linear probing).
+ *
+ * @returns - the hash table.
+ */
 htable htable_new(int capacity, hashing_t method){
     htable result = emalloc(sizeof *result);
     result->capacity = capacity;
@@ -37,6 +76,11 @@ htable htable_new(int capacity, hashing_t method){
     return result;
 }
 
+/**
+ * Frees all of the memory associated with the table.
+ *
+ * @param h - the hash table.
+ */
 void htable_free(htable h){
     int i;
     for (i = 0; i < h->capacity; i++){
@@ -50,6 +94,15 @@ void htable_free(htable h){
     free(h);
 }
 
+/**
+ * Inserts a new item into the table.
+ *
+ * @param h - the hash table.
+ * @param str - the item to insert. 
+ *
+ * returns - the (new) number of times the item occurs in the table,
+ * or 0 if the table is full. 
+ */
 int htable_insert(htable h, char *str){
     unsigned int wordint = htable_word_to_int(str);
     int insert_pos = wordint % h->capacity;
@@ -80,6 +133,14 @@ int htable_insert(htable h, char *str){
     }
 }
 
+/**
+ * Prints every non-null item in the table using the given function.
+ *
+ * @param h - the hash table.
+ * @param f - the function to use for printing.
+ * @param i - the number of times the item occurs.
+ * @param word - the item. 
+ */
 void htable_print(htable h, void f(int i, char *word)){
     int i;
 
@@ -90,6 +151,13 @@ void htable_print(htable h, void f(int i, char *word)){
     }
 }
 
+/**
+ * Prints the entire table, showing the frequency and collisions of
+ * each entry, as well as the key if there is one. 
+ *
+ * @param h - the hash table.
+ * @param stream - a stream to print the data to.
+ */
 void htable_print_entire_table(htable h, FILE *stream){
 	int i = 0;
 	fprintf(stream, "  Pos  Freq  Stats  Word\n");
@@ -103,7 +171,15 @@ void htable_print_entire_table(htable h, FILE *stream){
 	}
 }
 
-
+/**
+ * Searches the hash table for the given key and returns the number 
+ * of times it occurs in the table. 
+ *
+ * @param h - the hash table.
+ * @param key - the key to search for.
+ *
+ * @returns - the number of times the key occurs in the table.
+ */
 int htable_search(htable h, char *key){
     int collisions = 0;
     unsigned int keyint = htable_word_to_int(key);
