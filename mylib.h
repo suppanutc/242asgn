@@ -7,5 +7,6 @@
 extern void *emalloc(size_t);
 extern void *erealloc(void *, size_t);
 extern int getword(char *s, int limit, FILE *stream);
+extern int next_prime(int x);
 
 #endif

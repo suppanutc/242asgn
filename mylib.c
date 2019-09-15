@@ -47,3 +47,22 @@ int getword(char *s, int limit, FILE *stream) {
     *w = '\0';
     return w - s;
 }
+
+int next_prime(int x) {
+    int i, is_prime = 0;
+    while(is_prime == 0){
+	if (x % 2 == 0){
+	    x++;
+	}else{
+	    is_prime = 1;
+	    for(i = 3; i < x; i+=2){
+		if (x % i == 0){
+		    x++;
+		    is_prime = 0;
+		    break;
+		}
+	    } 
+	}
+    }
+    return x;
+}
