@@ -17,7 +17,7 @@ static unsigned int htable_word_to_int(char *word){
     unsigned int result = 0;
 
     while(*word != '\0') {
-        result = (*word++ + 31 *result);
+        result = (*word++ + 31 * result);
     }
     return result;
 }
@@ -46,6 +46,7 @@ void htable_free(htable h){
     }
     free(h->keys);
     free(h->frequencies);
+    free(h->stats);
     free(h);
 }
 
@@ -79,29 +80,25 @@ int htable_insert(htable h, char *str){
     }
 }
 
-void htable_print(htable h, FILE *stream){
-    int i, j = 0;
+void htable_print(htable h, void f(int i, char *word)){
+    int i;
 
     for(i = 0; i < h->capacity; i++){
-        j = 0;
         if(NULL != h->keys[i]){
-            fprintf(stream, "%-4d ", h->frequencies[i]);
-            while(h->keys[i][j] != '\0'){
-                fprintf(stream, "%c", h->keys[i][j]);
-                j++;
-            }
-            fprintf(stream, "\n");
+            f(h->frequencies[i], h->keys[i]);
         }
     }
 }
 
 void htable_print_entire_table(htable h, FILE *stream){
 	int i = 0;
+	fprintf(stream, "  Pos  Freq  Stats  Word\n");
+	fprintf(stream, "----------------------------------------\n");
 	for (i = 0; i < h->capacity; i++){
 	     if(NULL != h->keys[i]){
  		fprintf(stream, "%5d %5d %5d   %s\n", i, h->frequencies[i], h->stats[i], h->keys[i]);
 	     }else {
-	        fprintf(stream, "%5d %5d %5d    \n", i, h->frequencies[i], h->stats[i]);
+	        fprintf(stream, "%5d %5d %5d   \n", i, h->frequencies[i], h->stats[i]);
 	     }
 	}
 }

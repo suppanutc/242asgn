@@ -11,18 +11,15 @@ static void print_info(int freq, char *word) {
 
 int main(int argc, char **argv){
 	int capacity = 113;
-	char *p; /*variable required for strtol function, unutilised */
 	htable h;
-	FILE *infile, *outfile;
+	FILE *infile;
 	clock_t start_f, start_s, end_f, end_s;
-	double fill_t, search_t;
-	char word[256];
+	double fill_t = 0, search_t;
+	char word[256], option;
 	const char *optstring = "c:deps:t:h";
-	char option, *new_capacity;
 	hashing_t method = LINEAR_P;
-	int print_entire_table, print_stats, snapshots, snapshots_num,
-	 unknownCount, default_case, spellcheck = 0;
-	outfile = NULL;
+	int print_entire_table = 0, print_stats = 0, snapshots = 0, 
+	unknownCount = 0, spellcheck = 0;
 	infile = NULL;
 
 	while ((option = getopt(argc, argv, optstring)) != EOF) {
@@ -37,64 +34,90 @@ int main(int argc, char **argv){
 			case 'd':
 				method = DOUBLE_H;
 				break;
-			case 'e': //do this call print_entire_table
+			case 'e': 
 				print_entire_table = 1;
 				break;
-			case 'p': //do this
-				print_stats = 1; // no break because, it is used with s.
-				if (atoi(argv[4]) == 's') {
-					snapshots = 1;
-					snapshots_num = atoi(argv[5]);
-				}
+			case 'p': 
+				print_stats = 1; 
+				break;
+			case 's':
+				snapshots = atoi(optarg);
 				break;
 			case 't':
-				new_capacity = optarg;
-				capacity = atoi(new_capacity);
+				capacity = next_prime(atoi(optarg));
 				break;
 			case 'h':
-				printf("Help");
-				break;
+				fprintf(stderr, "Usage: ./asgn [OPTION]... <STDIN>\n\n");
+				fprintf(stderr, "Perform various operations using a hash table.  By default, words are\n");
+				fprintf(stderr, "read from stdin and added to the hash table, before being printed out\n");
+				fprintf(stderr, "alongside their frequencies to stdout.\n\n");
+				fprintf(stderr, " -c FILENAME  Check spelling of words in FILENAME using words\n");
+				fprintf(stderr, "              from stdin as dictionary.  Print unknown words to\n");
+				fprintf(stderr, "              stdout, timing info & count to stderr (ignore -p)\n");
+				fprintf(stderr, " -d           Use double hashing (linear probing is the default)\n");
+				fprintf(stderr, " -e           Display entire contents of hash table on stderr\n");
+				fprintf(stderr, " -p           Print stats info instead of frequencies & words\n");
+				fprintf(stderr, " -s SNAPSHOTS Show SNAPSHOTS stats snapshots (if -p is used)\n");
+				fprintf(stderr, " -t TABLESIZE Use the first prime >= TABLESIZE as htable size\n\n");
+				fprintf(stderr, " -h           Display this message\n");
+				return EXIT_SUCCESS;
 			default :
-				printf("Default");
-				default_case = 1;
-		}
-
-		h = htable_new(capacity, method); //fill table up with "method" way.
-		while (getword(word, sizeof word, stdin) != EOF){
-				htable_insert(h, word);
-		}
-
-		if (print_stats == 1 && snapshots == 1) {
-			htable_print_stats(h, stdout, snapshots_num);
-		} else {
-			htable_print_stats(h, stdout, 1); //standard case, if -s wasn't passed.
-		}
-		if (print_entire_table == 1) {
-			htable_print_entire_table(); //haven't fill argument.
-		}
-		if(spellcheck == 1){
-        start_s = clock();
-        while(getword(word, sizeof word, infile) != EOF) {
-            if(htable_search(h, word) != 1){ //pretty much a copy, only changed
-                unknownCount++; 						//it to htable_search.
-                fprintf(stdout, "%s\n", word);
-            }
-        }
-        end_s = clock();
-
-        fill_t = ((end_f - start_f)/(double)CLOCKS_PER_SEC);
-        search_t = ((end_s - start_s)/(double)CLOCKS_PER_SEC);
-        /** Print timing information and unknown word count. */
-        fprintf(stderr, "\nStats:\n");
-        fprintf(stderr, "Fill time     : %2.5f\n", fill_t);
-        fprintf(stderr, "Search time   : %2.5f\n", search_t);
-        fprintf(stderr, "Unknown words : %d\n", unknownCount);
-    }
-		if(default_case == 1) { //print normally if no option passed.
-			htable_print(h, print_info);
+				fprintf(stderr, "Usage: ./asgn [OPTION]... <STDIN>\n\n");
+				fprintf(stderr, "Perform various operations using a hash table.  By default, words are\n");
+				fprintf(stderr, "read from stdin and added to the hash table, before being printed out\n");
+				fprintf(stderr, "alongside their frequencies to stdout.\n\n");
+				fprintf(stderr, " -c FILENAME  Check spelling of words in FILENAME using words\n");
+				fprintf(stderr, "              from stdin as dictionary. Print unknown words to\n");
+				fprintf(stderr, "              stdout, timing info & count to stderr (ignore -p)\n");
+				fprintf(stderr, " -d           Use double hashing (linear probing is the default)\n");
+				fprintf(stderr, " -e           Display entire contents of hash table to stderr\n");
+				fprintf(stderr, " -p           Print stats info instead of frequencies & words\n");
+				fprintf(stderr, " -s SNAPSHOTS Show SNAPSHOTS stats snapshots (if -p is used)\n");
+				fprintf(stderr, " -t TABLESIZE Use the first prime >= TABLESIZE as htable size\n\n");
+				fprintf(stderr, " -h           Display this message\n");
+				return EXIT_FAILURE;	
 		}
 	}
-	/*do stuff*/
+
+	h = htable_new(capacity, method); 
+	while (getword(word, sizeof word, stdin) != EOF){
+		start_f = clock();
+		htable_insert(h, word);
+		end_f = clock();
+		fill_t += ((end_f - start_f)/(double)CLOCKS_PER_SEC);
+	}
+
+	
+
+	if (print_entire_table == 1) {
+		htable_print_entire_table(h, stderr); 
+	}
+
+	if(spellcheck == 1){
+		start_s = clock();
+		while(getword(word, sizeof word, infile) != EOF) {
+			if(htable_search(h, word) == 0){ 
+				unknownCount++; 						
+				fprintf(stdout, "%s\n", word);
+			}
+		}
+       		end_s = clock();
+	
+	        search_t = ((end_s - start_s)/(double)CLOCKS_PER_SEC);
+        	/** Print timing information and unknown word count. */
+        	fprintf(stderr, "Fill time     : %2.6f\n", fill_t);
+        	fprintf(stderr, "Search time   : %2.6f\n", search_t);
+        	fprintf(stderr, "Unknown words = %d\n", unknownCount);
+    	} else if (print_stats == 1 && snapshots > 0) {
+		htable_print_stats(h, stdout, snapshots);
+	} else if (print_stats == 1){
+		htable_print_stats(h, stdout, 10); 
+	}
+
+	if (print_stats == 0 && spellcheck == 0){
+		htable_print(h, print_info);
+	}
+	
 
 	htable_free(h);
 
