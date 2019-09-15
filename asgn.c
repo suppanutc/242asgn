@@ -5,21 +5,31 @@
 #include "mylib.h"
 #include "htable.h"
 
+/**
+ * A printing function to pass to htable_print.
+ *
+ * @param freq - the frequancy of the word.
+ * @param word - the word to print.
+ */
 static void print_info(int freq, char *word) {
 	printf("%-4d %s\n", freq, word);
 }
 
+/**
+ * Creates a hash table and fills it with input. Outputs information
+ * about the table based on the option input.
+ */
 int main(int argc, char **argv){
-	int capacity = 113;
+	int capacity = 113; /* capacity defaults to 113 */
 	htable h;
 	FILE *infile;
 	clock_t start_f, start_s, end_f, end_s;
-	double fill_t = 0, search_t;
+	double fill_t = 0, search_t = 0;
 	char word[256], option;
 	const char *optstring = "c:deps:t:h";
 	hashing_t method = LINEAR_P;
 	int print_entire_table = 0, print_stats = 0, snapshots = 0, 
-	unknownCount = 0, spellcheck = 0;
+	unknownCount = 0, spellcheck = 0; /* all to track options input */
 	infile = NULL;
 
 	while ((option = getopt(argc, argv, optstring)) != EOF) {
@@ -67,14 +77,15 @@ int main(int argc, char **argv){
 				fprintf(stderr, "read from stdin and added to the hash table, before being printed out\n");
 				fprintf(stderr, "alongside their frequencies to stdout.\n\n");
 				fprintf(stderr, " -c FILENAME  Check spelling of words in FILENAME using words\n");
-				fprintf(stderr, "              from stdin as dictionary. Print unknown words to\n");
+				fprintf(stderr, "              from stdin as dictionary.  Print unknown words to\n");
 				fprintf(stderr, "              stdout, timing info & count to stderr (ignore -p)\n");
 				fprintf(stderr, " -d           Use double hashing (linear probing is the default)\n");
-				fprintf(stderr, " -e           Display entire contents of hash table to stderr\n");
+				fprintf(stderr, " -e           Display entire contents of hash table on stderr\n");
 				fprintf(stderr, " -p           Print stats info instead of frequencies & words\n");
 				fprintf(stderr, " -s SNAPSHOTS Show SNAPSHOTS stats snapshots (if -p is used)\n");
 				fprintf(stderr, " -t TABLESIZE Use the first prime >= TABLESIZE as htable size\n\n");
 				fprintf(stderr, " -h           Display this message\n");
+
 				return EXIT_FAILURE;	
 		}
 	}
